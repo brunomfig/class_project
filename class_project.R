@@ -33,20 +33,8 @@ for(i in 1:nrow(yld_t_ha)){
   yld_t_ha$season_rainfall_mm[i] <- 
     filter(rainfall_mm,date >= yld_t_ha$plant_date[i] & date <= yld_t_ha$harvest_date[i]) %>%
     select(.,rainfall_mm) %>%
-    sum(.)
-}
+    sum(.)}
 
-# merging raifall and yield data
-master_data <- merge(yld_t_ha,rainfall_mm, by ="year", all = TRUE)
-
-# calculating season rainfall
-master_datav2 <-
-  master_data %>%
-  filter(date >= plant_date & date <= harvest_date) %>%
-  group_by(plant_date,harvest_date,yield_t_ha) %>%
-  head
-#  summarize(season_rainfall_mm = sum(rainfall_mm))
-  
 #---------------------------------------------- Analyzing the data -------------------------------------------
 #plot yield data over years
 ggplot(master_data, aes(x = year, y = yield_t_ha)) + geom_line() + xlab("Year") + ylab("Yield (T/ha)" )
