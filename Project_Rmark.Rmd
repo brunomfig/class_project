@@ -1,0 +1,88 @@
+---
+title: "Influences of precipitation on the Wheat Productivity in Southern Great Plains"
+author: "Gurjinder Baath, Jagmandeep Dhillon, Bruno Figueiredo, and Melissa Golden"
+date: "December 1, 2016"
+output: html_document
+bibliography: bibliography.bib
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+```{r "read.xlsx", include=FALSE, echo=FALSE}
+#packages to be used
+library(dplyr)
+library(ggplot2)
+#import rainfall data
+weather_data <- read.csv("./data/weather_data.csv", header = TRUE)
+#replace negative values (missing or questionable data) with 0
+weather_data$rain[weather_data$rain < 0] <- 0
+
+#create rainfall table with dates
+rainfall_mm <- weather_data %>%
+  mutate(rainfall_mm = rain * 25.4) %>%
+  select(year, rainfall_mm)
+
+#create a date value column
+rainfall_mm$date <- as.Date(with(weather_data, paste(year, month, day, sep="-")), "%Y-%m-%d" )
+
+# import yld data for all treatments 
+all_yield_data <- read.csv("./data/all_trts.csv", header = TRUE)
+#comining rainfall and yields
+all_yield_data$plant_date <- as.Date(all_yield_data$plant_date, "%m/%d/%Y")
+all_yield_data$harvest_date <- as.Date(all_yield_data$harvest_date, "%m/%d/%Y")
+
+for(i in 1:nrow(all_yield_data)){
+  all_yield_data$season_rainfall_mm[i] <- 
+    filter(rainfall_mm,date >= all_yield_data$plant_date[i] & date <= all_yield_data$harvest_date[i]) %>%
+    select(.,rainfall_mm) %>%
+    sum(.)}
+```
+
+## Introduction
+Water is generally considered to be the most important factor affecting crop production, especially in the semi-arid regions of the world. In southern great plains of the United States (US), the agriculture production system is mainly rain fed that means irrigation is mostly received through natural precipitation. However, the amount of rainfall is highly erratic, and prolonged droughts occur frequently in these regions [@schneider]. Perhaps, it is not appropriate to define a drought period just based on the amount of rainfall received during that period [@li]. Actually, a drought is more related to the timing of rainfall occurrence along with its effectiveness [@wan]. Therefore, each drought period is unique in terms of its impacts and climatic characteristics. Although, the rainfall received during a crop growing is low it could be effective due to its occurrence on critical stages of crop. While, a heavy rainfall could be ineffective if received when crop water demand is low. 	
+Wheat (Triticum aestivum L.)  is one of the most important food crops of the United States and of Oklahoma state as well [@epplin].  It contributes to a great extent in the economic sector of Oklahoma, thus an important financial product in the state [@greene]. The wheat grown by farmers in these regions is called winter wheat which is generally planted and grow in fall, become dormant in winter and start its growth again in spring. It is grown are area of about 3.3 million acres in Oklahoma. It is the primary source of grains as well as forage for growing cattle. Dual-purpose wheat (grain and graze) is generally grazed from mid-November through early March followed by grain harvest, while if wheat is grown for full-season pasture grazing is usually from mid-November through May [@mackown]. The most of wheat fields are managed under rain fed environment without any artificial irrigation [@bushong]. 
+A lot of variation in wheat productivity of Oklahoma has been seen over the years [@spath]. For instance, the estimated yield is 40 bu/ac in 2016, which is 54% more as compared to 26 bu/ac of 2015 (USDA NASS, 2016). It is well assumed that climate variability which mainly includes amount of precipitation has been a determinant of wheat productivity over the years [@greene]. However, management factors like planting date, fertilizers etc. can also be limiting in spite of receiving sufficient precipitation. Thus, the main focus of the study was to assess the relationship between the amount of rainfall received during the growing season and the wheat productivity. 
+
+
+## Methods
+The final grain yield data for the period 1995-2015 were obtained from the long term wheat fertility experiment # 502, which has been conducted at the Lahoma Research Station, Oklahoma. The experiment involves a plot size of 16' x 60' and an alley of 20', and the total area under trial is 224' x 300'. Two fertilizer treatments which include trt2 (N=0, P - P2o5-45, K- k2o 67) and trt7(n = 112 kgN/ha, same P and K as trt2) were used. The precipitation data for the experiment site were downloaded from the Lahoma Mesonet climate-monitoring station [@okmes] for the pertinent time periods of involved wheat grain yield data. A considerable amount of grain yield data for the year 2001 was missing, thus the precipitation and yield data for that year were not included in the analysis and interpretation. The statistical analysis and figures presented were formed using R statistical programming language [@Rproject]. The dplyr package was used for data manipulation [@dplyr]. All the figures were created using the ggplot2 package [@gg].The equation for the relationship between the two varaiables was estimated by using ggmpmisc package [@gmisc]  Using R studio, a R markdown document containing R code was created. The knitr program was then used to convert R markdown document into a webpage html document [@knitr1;@knitr2;@knitr3].
+
+```{r plot_trt2, echo=FALSE}
+library(ggpmisc)
+#trt2
+m <- y ~ x
+ggplot(all_yield_data, aes(x = season_rainfall_mm, y = X2)) +  geom_point(size = 2, colour = "black") +
+  geom_point(size = 1, colour = "white") +
+  geom_smooth(aes(colour = "black"),
+              method='lm')+ stat_poly_eq(formula = m, 
+                                         aes(label = paste(..eq.label.., ..rr.label.., sep = "~~~")), 
+                                         parse = TRUE) +ggtitle("Trt2 vs Rainfall") + xlab("Rainfall (mm)") + ylab("Yield (T/ha)")
+```
+
+```
+
+```{r plot_trt7, echo = FALSE}
+#trt7
+ggplot(all_yield_data, aes(x = season_rainfall_mm, y = X7)) +  geom_point(size = 2, colour = "black") +
+  geom_point(size = 1, colour = "white") +
+  geom_smooth(aes(colour = "black"),
+              method='lm')+ stat_poly_eq(formula = m, 
+                                         aes(label = paste(..eq.label.., ..rr.label.., sep = "~~~")), 
+                                         parse = TRUE)+ggtitle("Trt7 vs Rainfall") + xlab("Rainfall (mm)") + ylab("Yield (T/ha)")
+
+```
+
+## Results
+ The amonut of precipitation received starting from the planting of wheat to its  harvesting during each growing season was plotted as explanatory variable against the final wheat grain yield of the corresponding season as dependent variable for both the treatments (Figure 1,2).For both the treatments, relationships between amount of precipitation and grain yield come out to be very weak and the r-square values were found to be very small.
+
+## Discussion
+
+
+## References
+ 
+
+
